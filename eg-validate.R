@@ -1,4 +1,4 @@
-library(shiny)
+inputlibrary(shiny)
 
 ## Only run examples in interactive R sessions
 if (interactive()) {
