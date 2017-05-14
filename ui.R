@@ -3,8 +3,8 @@ library(shiny)
 
 projstart <- "2014-01-01"
 
-fluidPage(
-  titlePanel("Upload and check"),
+fluidPage(theme = "yeti.css",
+  titlePanel("Fish Exploitation Data Entry"),
   
   fluidRow(
     column(4,
@@ -12,12 +12,17 @@ fluidPage(
              fileInput('vrl', 'Upload vrl file',
                        accept=c('.vrl'))
            ),
+           
            wellPanel(
-             actionButton("submit", "Submit to Dropbox!")
+             actionButton("submit", "Submit to Dropbox")
            ),
            
            wellPanel(
-             actionButton("next", "Next vrl")
+             actionButton("new", "New submission")
+           ),
+  
+           wellPanel(
+             textOutput("success")
            )
            
     ),
@@ -25,9 +30,9 @@ fluidPage(
     column(4,
            h3("Receiver In"),
            wellPanel(
-             textInput(inputId = "EastingIn", label = "Enter Easting"),
-             textInput(inputId = "NorthingIn", label = "Enter Northing"),
-             dateInput(inputId = "DateIn", label = "Select Date", 
+             textInput(inputId = "EastingIn", label = "Enter Easting (UTM):"),
+             textInput(inputId = "NorthingIn", label = "Enter Northing (UTM):"),
+             dateInput(inputId = "DateIn", label = "Select Date:", 
                        min = projstart, max = Sys.Date())
            )
     ),
@@ -35,9 +40,9 @@ fluidPage(
     column(4,
            h3("Receiver Out"),
            wellPanel(
-             textInput(inputId = "EastingOut", label = "Enter Easting"),
-             textInput(inputId = "NorthingOut", label = "Enter Northing"),
-             dateInput(inputId = "DateOut", label = "Select Date", 
+             textInput(inputId = "EastingOut", label = "Enter Easting (UTM):"),
+             textInput(inputId = "NorthingOut", label = "Enter Northing (UTM):"),
+             dateInput(inputId = "DateOut", label = "Select Date:", 
                        min = projstart, max = Sys.Date())
            )
     ))
