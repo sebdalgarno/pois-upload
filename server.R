@@ -3,73 +3,71 @@ source('dropbox.R')
 library(shinyjs)
 
 function(input, output, session) {
-  
-  df <- reactive({
-    df <- data.frame(EastingIn = input$EastingIn, 
-                     NorthingIn = input$NorthingIn)
+  observe({
+    shinyjs::toggleState("submit", 
+                         input$EastingIn != "" && 
+                           input$NorthingIn != "" &&
+                           input$DateIn != Sys.Date()+1 &&
+                           input$EastingOut != "" && 
+                           input$NorthingOut != "" &&
+                           input$DateOut != Sys.Date()+1 &&
+                           !is.null(input$vrl))
+                           
   })
   
+  shinyjs::onclick("instruct",
+                   shinyjs::toggle(id = "instructions", anim = TRUE))  
   
-  submit <- observe({
+  observeEvent(input$instruct, {
+    shinyjs::alert("1. Upload a .vrl file.
+                  2. For that vrl, \nspecify the location and date that the receiver went in and out, using the fields in the sidebar.
+                  3. Click 'Submit to Dropbox' button to complete that vrl and start a new one. Note, you can only click the submit button once all location and date fields have been filled out.")
+  })
+  
+  observeEvent(input$reset, {
+    shinyjs::reset("app")
+  })
+  
+  observe ({
     if(input$submit == 0) return()
     
-    else{
-      output$success <- renderText({
-        validate(
-          need(input$EastingIn != '', "Please fill out all fields")
-        )
-      })
-      
-      
-      saveDrop(df)
-      
-      output$success <- renderText("Successfully submitted!")
-    }
-  })
-  new <- observe({
-    if(input$new == 0 ) return()
-    else{
-      updateTextInput(session, "EastingIn", value = "")
-      updateTextInput(session, "NorthingIn", value = "")
-      output$success <- renderText("")
-    }
-  })
+
+      else{
+        
+        df <- data.frame(EastingIn = input$EastingIn,
+                         NorthingIn = input$NorthingIn,
+                         DateIn = input$DateIn)
+        
+        saveDrop(df)
+        
+        output$success <- renderText({
+          validate(
+            need(input$EastingIn != '', "Please fill out all fields")
+          )
+        })
+
+        output$success <- renderText("Successfully submitted!")
+      }
+    })
 }
 
   
 
 
 
-# cannot get message anywhere
-# observeEvent(input$submit, {
+# df <- reactive({
+#   df <- data.frame(EastingIn = input$EastingIn, 
+#                    NorthingIn = input$NorthingIn)
+# })
+# 
+
+# submit <- observe({
 #   
-#   output$success <- renderText({
-#     validate(
-#       need(input$EastingIn > 22222 & input$EastingIn < 33333 &
-#              input$NorthingIn > 11111 & input$NorthingIn < 55555,
-#            "Receiver In location is outside of Lake!"),
-#       need(input$EastingOut > 22222 & input$EastingOut < 33333 &
-#              input$NorthingOut > 11111 & input$NorthingOut < 55555,
-#            "Receiver Out location is outside of Lake!"),
-#       need(input$EastingIn, "Please fill out all spaces."),
-#       need(input$Eastingout, "Please fill out all spaces."),
-#       need(input$NorthingIn, "Please fill out all spaces."),
-#       need(input$NorthingOut, "Please fill out all spaces."),
-#       need(input$DateIn, "Please fill out all spaces."),
-#       need(input$DateOut, "Please fill out all spaces."),
-#       need(input$vrl, "Please upload a vrl file.")
-#     )
-#     
-#     df <- data.frame(EastingIn = input$EastingIn, NorthingIn = input$NorthingIn,
-#                      DateReceiverIn = input$DateIn,
-#                      EastingOut = input$EastingOut, NorthingOut = input$NorthingOut,
-#                      DateReceiverOut = input$DateOut)
-#     
-#     write.csv(df, "test2df")
-#     drop_upload("testdf.csv", dest = "ShinyTest")
-#     
-#     output$success <- renderText("Successfully submitted!")
-#   })
-#   
-# }
-  
+# new <- observe({
+#   if(input$new == 0 ) return()
+#   else{
+#     updateTextInput(session, "EastingIn", value = "")
+#     updateTextInput(session, "NorthingIn", value = "")
+#     output$success <- renderText("")
+#   }
+# })
