@@ -1,6 +1,18 @@
 library(shiny)
-source('dropbox.R')
 library(shinyjs)
+library(rdrop2)
+
+outputDir <- "Shiny-vrl-uploads"
+
+saveDrop <- function(data) {
+  # Create a unique file name
+  fileName <- sprintf("%s_%s.csv", as.integer(Sys.time()), digest::digest(data))
+  # Write the data to a temporary file locally
+  filePath <- file.path(tempdir(), fileName)
+  write.csv(data, filePath, row.names = FALSE, quote = TRUE)
+  # Upload the file to Dropbox
+  drop_upload(filePath, dest = outputDir)
+}
 
 function(input, output, session) {
   observe({
@@ -24,50 +36,26 @@ function(input, output, session) {
                   3. Click 'Submit to Dropbox' button to complete that vrl and start a new one. Note, you can only click the submit button once all location and date fields have been filled out.")
   })
   
-  observeEvent(input$reset, {
-    shinyjs::reset("app")
-  })
-  
-  observe ({
-    if(input$submit == 0) return()
+  observeEvent (input$submit, {
     
-
-      else{
+        # conditions looking for human error
+        if(input$EastingIn != 22) return(shinyjs::alert("Location is not within lake"))
         
-        df <- data.frame(EastingIn = input$EastingIn,
-                         NorthingIn = input$NorthingIn,
-                         DateIn = input$DateIn)
-        
-        saveDrop(df)
-        
-        output$success <- renderText({
-          validate(
-            need(input$EastingIn != '', "Please fill out all fields")
-          )
-        })
-
-        output$success <- renderText("Successfully submitted!")
-      }
-    })
+        else{
+          withProgress(message = "Uploading...", value = 0, {
+            df <- data.frame(EastingIn = input$EastingIn,
+                             NorthingIn = input$NorthingIn,
+                             DateIn = input$DateIn)
+            
+            saveDrop(df)
+            
+            incProgress(0.5)
+            
+          })
+          
+          shinyjs::info("Successfully submitted!")
+          shinyjs::reset("app")
+          
+        }
+      })
 }
-
-  
-
-
-
-# df <- reactive({
-#   df <- data.frame(EastingIn = input$EastingIn, 
-#                    NorthingIn = input$NorthingIn)
-# })
-# 
-
-# submit <- observe({
-#   
-# new <- observe({
-#   if(input$new == 0 ) return()
-#   else{
-#     updateTextInput(session, "EastingIn", value = "")
-#     updateTextInput(session, "NorthingIn", value = "")
-#     output$success <- renderText("")
-#   }
-# })

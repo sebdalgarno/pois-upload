@@ -7,7 +7,7 @@ projstart <- "2014-01-01"
 fluidPage(
   useShinyjs(),
   theme = "yeti.css",
-  titlePanel("Poisson Consulting Ltd. Data Entry"),
+  titlePanel("Horseshoe Lake Exploitation Study Data Entry"),
   
   div(id = "app",
     fluidRow(
@@ -17,7 +17,7 @@ fluidPage(
                          accept=c('.vrl'))
              ),
              
-             actionButton("submit", "Submit to Dropbox"),
+             actionButton("submit", "Submit (no undo)"),
              br(), br(),
              actionButton("reset", "Reset fields"),
              br(), br(),
@@ -54,15 +54,8 @@ fluidPage(
                          value = Sys.Date()+1),
                textInput(inputId = "CommentsOut", label = "Comments")
              )
-      )),
-    
-    fluidRow(
-      column(12,
-             h3("Something went wrong."),
-             wellPanel(
-               textOutput("success")
-             ))
-    )
+      ))
+  
   )
   
 )
